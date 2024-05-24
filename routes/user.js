@@ -291,4 +291,24 @@ router.post(
   }
 )
 
+// get all carte of the user
+router.post("/allCarte", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.user
+    const utilisateur = await Utilisateur.findById(id).select("carteBancaire")
+    if (!utilisateur) {
+      return res
+        .status(404)
+        .json({ message: "Utilisateur non trouvé", status: "error" })
+    }
+
+    res
+      .status(201)
+      .json({ cartes: utilisateur.carteBancaire, status: "success" })
+  } catch (error) {
+    console.error(error.message)
+    res.status(500).json({ message: error.message, status: "error" })
+  }
+})
+
 export default router
