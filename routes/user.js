@@ -164,6 +164,7 @@ router.get("/defaultCarte", authenticateToken, async (req, res) => {
         .status(404)
         .json({ message: "Utilisateur non trouvé", status: "error" })
     }
+
     const carteNumber = utilisateur.carteBancaire.length
     if (carteNumber == 0) {
       return res
@@ -230,6 +231,59 @@ router.delete(
       res
         .status(201)
         .json({ message: "Carte supprimée avec succès", status: "success" })
+    } catch (error) {
+      console.error(error.message)
+      res.status(500).json({ message: error.message, status: "error" })
+    }
+  }
+)
+
+// change default carte
+router.post(
+  "/changeDefaultCarte",
+  authenticateToken,
+  body("id").trim().notEmpty(),
+  async (req, res) => {
+    try {
+      const errors = validationResult(req)
+      const { id } = req.user
+      const carteID = req.params.id
+
+      if (!errors.isEmpty()) {
+        return res
+          .status(400)
+          .json({ message: "Validation failed", errors: errors.array() })
+      }
+
+      const utilisateur = await Utilisateur.findById(id).select("carteBancaire")
+      if (!utilisateur) {
+        return res
+          .status(404)
+          .json({ message: "Utilisateur non trouvé", status: "error" })
+      }
+
+      const carte = utilisateur.carteBancaire.id(carteID)
+      if (!carte) {
+        return res
+          .status(404)
+          .json({ message: "Carte non trouvé", status: "error" })
+      }
+
+      const defaultCard = utilisateur.carteBancaire.find(
+        (carte) => carte.isdefault
+      )
+      if (!defaultCard) {
+        return res.status(404).json({ message: "Carte bancaire non trouvée" })
+      }
+
+      defaultCard.isdefault = false
+      carte.isdefault = true
+
+      await utilisateur.save()
+
+      res
+        .status(201)
+        .json({ message: "Carte modifiée avec succès", status: "success" })
     } catch (error) {
       console.error(error.message)
       res.status(500).json({ message: error.message, status: "error" })
