@@ -1,6 +1,6 @@
 import { Router } from "express"
 import Utilisateur from "../models/utilisateur.js"
-import { authenticateToken, generateAccessToken } from "../middleware.js"
+import { authenticateToken } from "../middleware.js"
 import { body, param, validationResult } from "express-validator"
 const router = Router()
 
@@ -74,8 +74,8 @@ router.put("/update", authenticateToken, userValidator, async (req, res) => {
 const carteValidator = [
   body("nomProprietaire").trim().notEmpty(),
   body("isdefault").trim().notEmpty().isBoolean(),
-  body("numCarte").trim().notEmpty().isNumeric(),
-  body("cvv").trim().notEmpty().isNumeric(),
+  body("numCarte").trim().notEmpty().isNumeric().isLength(16),
+  body("cvv").trim().notEmpty().isNumeric().isLength(3),
   body("dateExperation").trim().notEmpty().isISO8601().toDate(),
   (req, res, next) => {
     const errors = validationResult(req)
