@@ -3,7 +3,7 @@ import { model, Schema } from "mongoose"
 const cartebancaireSchema = new Schema({
   nomProprietaire: { type: String, required: true },
   numCarte: { type: Number, required: true, unique: true, sparse: true },
-  cvv: { type: Number, required: true },
+  cvv: { type: String, required: true },
   dateExperation: { type: Date, required: true },
   isdefault: { type: Boolean, default: false },
 })
