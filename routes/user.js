@@ -240,7 +240,7 @@ router.delete(
 
 // change default carte
 router.post(
-  "/changeDefaultCarte",
+  "/changeDefaultCarte/:id",
   authenticateToken,
   body("id").trim().notEmpty(),
   async (req, res) => {

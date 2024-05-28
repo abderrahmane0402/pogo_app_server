@@ -57,12 +57,12 @@ router.post("/login", loginValidator, async (req, res) => {
 const registreValidator = [
   body("nom").trim().notEmpty(),
   body("prenom").trim().notEmpty(),
-  body("telephone").trim().notEmpty().isLength({ min: 8 }),
-  body("password").trim().notEmpty().isLength({ min: 9 }),
+  body("telephone").trim().notEmpty().isLength({ min: 10 }),
+  body("password").trim().notEmpty().isLength({ min: 8 }),
   body("confirmePassword")
     .trim()
     .notEmpty()
-    .isLength({ min: 9 })
+    .isLength({ min: 8 })
     .custom((value, { req }) => {
       if (value !== req.body.password) {
         throw new Error("Password confirmation does not match password")
