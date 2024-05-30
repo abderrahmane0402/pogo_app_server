@@ -313,6 +313,7 @@ router.post("/allCarte", authenticateToken, async (req, res) => {
 
 router.get("/getUserCarte", async (req, res) => {
   const { id_user, id_carte } = req.body
+  console.log(id_user, id_carte, "id_user, id_carte")
 
   const user = await Utilisateur.findById(id_user)
   if (!user) {
