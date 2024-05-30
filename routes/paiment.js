@@ -14,7 +14,6 @@ const paimentValidator = [
   body("cvv").trim().notEmpty().isNumeric().isLength(3),
   body("dateExperation").trim().notEmpty().isISO8601().toDate(),
   body("user_id").trim().notEmpty(),
-  body("carte_id").trim().notEmpty(),
   (req, res, next) => {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
@@ -34,7 +33,6 @@ router.post("/", authenticateToken, paimentValidator, async (req, res) => {
       cvv,
       dateExperation,
       user_id: recepteur_id,
-      carte_id,
     } = req.body
     const { id: emeteur_id } = req.user
 
