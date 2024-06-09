@@ -9,25 +9,25 @@ import PaimentRouter from "./routes/paiment.js"
 const app = express()
 const port = 3000
 
-// https configuration
-const privateKey = fs.readFileSync("localhost-key.pem", "utf8")
-const certificate = fs.readFileSync("localhost.pem", "utf8")
+// // https configuration
+// const privateKey = fs.readFileSync("localhost-key.pem", "utf8")
+// const certificate = fs.readFileSync("localhost.pem", "utf8")
 
-const passphrase = "gaurav" 
-const credentials = { key: privateKey, passphrase, cert: certificate }
+// const passphrase = "gaurav" 
+// const credentials = { key: privateKey, passphrase, cert: certificate }
 
-const httpsServer = https.createServer(credentials, app)
-function ensureSecure(req, res, next) {
-  if (req.secure) {
-    // Request is already secure (HTTPS)
-    return next()
-  }
-  // Redirect to HTTPS version of the URL
-  res.redirect("https://" + req.hostname + req.originalUrl)
-}
+// const httpsServer = https.createServer(credentials, app)
+// function ensureSecure(req, res, next) {
+//   if (req.secure) {
+//     // Request is already secure (HTTPS)
+//     return next()
+//   }
+//   // Redirect to HTTPS version of the URL
+//   res.redirect("https://" + req.hostname + req.originalUrl)
+// }
 
 // Use the middleware to enforce HTTPS
-app.use(ensureSecure)
+// app.use(ensureSecure)
 
 app.use(json())
 app.use("/auth", AuthRouter)
@@ -45,6 +45,6 @@ app.get("/", async (req, res) => {
   res.send("hi")
 })
 
-httpsServer.listen(port, () => {
-  console.log(`HTTPS server running on port ${port}`)
+app.listen(port, () => {
+  console.log(`HTTP server running on port ${port}`)
 })
