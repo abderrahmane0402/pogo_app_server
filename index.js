@@ -1,4 +1,6 @@
 import express, { json } from "express"
+import https from "https"
+import fs from "fs"
 import { dbConnect } from "./db.js"
 import AuthRouter from "./routes/auth.js"
 import UserRouter from "./routes/user.js"
@@ -6,6 +8,26 @@ import PaimentRouter from "./routes/paiment.js"
 
 const app = express()
 const port = 3000
+
+// https configuration
+const privateKey = fs.readFileSync("localhost-key.pem", "utf8")
+const certificate = fs.readFileSync("localhost.pem", "utf8")
+
+const passphrase = "gaurav" 
+const credentials = { key: privateKey, passphrase, cert: certificate }
+
+const httpsServer = https.createServer(credentials, app)
+function ensureSecure(req, res, next) {
+  if (req.secure) {
+    // Request is already secure (HTTPS)
+    return next()
+  }
+  // Redirect to HTTPS version of the URL
+  res.redirect("https://" + req.hostname + req.originalUrl)
+}
+
+// Use the middleware to enforce HTTPS
+app.use(ensureSecure)
 
 app.use(json())
 app.use("/auth", AuthRouter)
@@ -23,6 +45,6 @@ app.get("/", async (req, res) => {
   res.send("hi")
 })
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+httpsServer.listen(port, () => {
+  console.log(`HTTPS server running on port ${port}`)
 })
