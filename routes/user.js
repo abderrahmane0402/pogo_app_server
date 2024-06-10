@@ -26,7 +26,6 @@ router.get("/", authenticateToken, async (req, res) => {
 
 // data validator for updateUser
 const userValidator = [
-  param("id").trim().notEmpty(),
   body("nom").trim().notEmpty(),
   body("prenom").trim().notEmpty(),
   body("telephone").trim().notEmpty().isLength({ min: 10 }),
@@ -90,7 +89,8 @@ const carteValidator = [
 
 // add carte bancaire
 
-router.post("/addCarte",
+router.post(
+  "/addCarte",
   authenticateToken,
   carteValidator,
   async (req, res) => {
@@ -187,7 +187,7 @@ router.get("/defaultCarte", authenticateToken, async (req, res) => {
 
 // delete carte bancaire
 router.delete(
-  "/deleteCarte/:id", 
+  "/deleteCarte/:id",
   authenticateToken,
   param("id").trim().notEmpty(),
   async (req, res) => {
