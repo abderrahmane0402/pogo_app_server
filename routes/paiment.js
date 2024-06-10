@@ -185,12 +185,22 @@ router.post("/", authenticateToken, paimentValidator, async (req, res) => {
       cartebancaireDestinataire: recepteurCarte.id,
       montant: amount,
       dateOperation: new Date(),
-      Etat_de_la_transaction: "réussie",
+      Etat_de_la_transaction: "en cours",
       remarque: "Paiment effectuer avec succès",
     }).save()
     return res
       .status(200)
       .json({ message: "Paiment success", status: postResponse.Response })
+  } catch (error) {
+    console.error(error.message)
+    res.status(500).json({ message: error.message, status: "error" })
+  }
+})
+
+router.get("/historique", async (req, res) => {
+  try {
+    const historique = await Paiment.find()
+    res.send(historique)
   } catch (error) {
     console.error(error.message)
     res.status(500).json({ message: error.message, status: "error" })
