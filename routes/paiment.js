@@ -197,10 +197,70 @@ router.post("/", authenticateToken, paimentValidator, async (req, res) => {
   }
 })
 
-router.get("/historique", async (req, res) => {
+router.get("/historique/:etat", async (req, res) => {
   try {
-    const historique = await Paiment.find()
+    const { etat } = req.params
+    let historique = await Paiment.find()
+      .populate({
+        path: "emeteur",
+        select: ["nom", "prenom", "telephone", "carteBancaire"],
+      })
+      .populate({
+        path: "destinataire",
+        select: ["nom", "prenom", "telephone", "carteBancaire"],
+      })
+      .exec()
+
+    switch (etat) {
+      case "encours":
+        historique = historique.filter(
+          (doc) => doc.Etat_de_la_transaction == "en cours"
+        )
+        break
+      case "echouee":
+        historique = historique.filter(
+          (doc) => doc.Etat_de_la_transaction == "échouer"
+        )
+        break
+      case "reussie":
+        historique = historique.filter(
+          (doc) => doc.Etat_de_la_transaction == "reussie"
+        )
+        break
+
+      default:
+        historique = []
+        break
+    }
+
+    historique.forEach((doc) => {
+      if (doc.emeteur && doc.emeteur.carteBancaire) {
+        doc.emeteur.carteBancaire = doc.emeteur.carteBancaire.filter(
+          (carte) => carte.id === doc.cartebancaireEmeteur.toString()
+        )
+      }
+      if (doc.destinataire && doc.destinataire.carteBancaire) {
+        doc.destinataire.carteBancaire = doc.destinataire.carteBancaire.filter(
+          (carte) => carte.id === doc.cartebancaireDestinataire.toString()
+        )
+      }
+    })
+
     res.send(historique)
+  } catch (error) {
+    console.error(error.message)
+    res.status(500).json({ message: error.message, status: "error" })
+  }
+})
+
+router.put("/etat", async (req, res) => {
+  try {
+    const { id, etat } = req.body
+    await Paiment.findByIdAndUpdate(id, { Etat_de_la_transaction: etat })
+    res.send({
+      message: "Etat de la transaction modifié avec succès",
+      status: "success",
+    })
   } catch (error) {
     console.error(error.message)
     res.status(500).json({ message: error.message, status: "error" })

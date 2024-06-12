@@ -5,15 +5,18 @@ import { dbConnect } from "./db.js"
 import AuthRouter from "./routes/auth.js"
 import UserRouter from "./routes/user.js"
 import PaimentRouter from "./routes/paiment.js"
+import cors from "cors"
 
 const app = express()
 const port = 3000
+
+app.use(cors({ origin: "http://localhost:5173" }))
 
 // // https configuration
 // const privateKey = fs.readFileSync("localhost-key.pem", "utf8")
 // const certificate = fs.readFileSync("localhost.pem", "utf8")
 
-// const passphrase = "gaurav" 
+// const passphrase = "gaurav"
 // const credentials = { key: privateKey, passphrase, cert: certificate }
 
 // const httpsServer = https.createServer(credentials, app)
