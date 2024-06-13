@@ -30,8 +30,7 @@ router.post("/login", loginValidator, async (req, res) => {
       "-carteBancaire"
     )
     if (!user) {
-      res.status(400).send({ message: "User not found", status: "error" })
-      return
+      return res.status(400).send({ message: "User not found", status: "error" })
     }
     if (!bcrypt.compareSync(password, user.password)) {
       res.status(400).send({ message: "password incorrect", status: "error" })
