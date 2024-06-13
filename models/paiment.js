@@ -10,7 +10,7 @@ const paimentSchema = new Schema({
     ref: "Utilisateur",
     required: true,
   },
-  cartebancaireEmeteur: { type: Schema.Types.ObjectId, required: true },
+  cartebancaireEmeteur: { type: Schema.Types.ObjectId, required: true},
   cartebancaireDestinataire: { type: Schema.Types.ObjectId, required: true },
   remarque: { type: String, required: true },
 })

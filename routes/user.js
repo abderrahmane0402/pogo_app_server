@@ -2,6 +2,7 @@ import { Router } from "express"
 import Utilisateur from "../models/utilisateur.js"
 import { authenticateToken } from "../middleware.js"
 import { body, param, validationResult } from "express-validator"
+import bcrypt from "bcrypt"
 const router = Router()
 
 // getUser
@@ -310,7 +311,7 @@ router.post("/allCarte", authenticateToken, async (req, res) => {
   }
 })
 
-router.post("/getUserCarte", async (req, res) => {
+router.post("/getUserCarte", authenticateToken, async (req, res) => {
   const { id_user, id_carte } = req.body
 
   const user = await Utilisateur.findById(id_user)
@@ -331,6 +332,61 @@ router.post("/getUserCarte", async (req, res) => {
     },
     carte,
   })
+})
+
+// updatePassword validator
+const updatePasswordValidator = [
+  body("newPassword").trim().notEmpty().isLength({ min: 8 }),
+  body("oldPassword").trim().notEmpty().isLength({ min: 8 }),
+  body("confirmePassword")
+    .trim()
+    .notEmpty()
+    .isLength({ min: 8 })
+    .custom((value, { req }) => {
+      if (value !== req.body.newPassword) {
+        throw new Error("Password confirmation does not match password")
+      }
+      return true
+    }),
+  (req, res, next) => {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res
+        .status(400)
+        .json({ message: "Validation failed", errors: errors.array() })
+    }
+    next()
+  },
+]
+
+// update password
+
+router.put("/updatePassword", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.user
+    const { oldPassword, newPassword } = req.body
+    const user = await Utilisateur.findById(id)
+    if (!user) {
+      return res
+        .status(404)
+        .json({ message: "Utilisateur non trouvé", status: "error" })
+    }
+
+    if (!bcrypt.compareSync(oldPassword, user.password)) {
+      return res
+        .status(400)
+        .send({ message: "password incorrect", status: "error" })
+    }
+
+    user.password = newPassword
+    await user.save()
+    res
+      .status(200)
+      .json({ message: "Mot de passe modifié avec succès", status: "success" })
+  } catch (error) {
+    console.error(error.message)
+    res.status(500).json({ message: error.message, status: "error" })
+  }
 })
 
 export default router
