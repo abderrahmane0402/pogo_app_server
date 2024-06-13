@@ -378,7 +378,8 @@ router.put("/updatePassword", authenticateToken, async (req, res) => {
         .send({ message: "password incorrect", status: "error" })
     }
 
-    user.password = newPassword
+    const cryptedPassword = await bcrypt.hash(newPassword, 10)
+    user.password = cryptedPassword
     await user.save()
     res
       .status(200)

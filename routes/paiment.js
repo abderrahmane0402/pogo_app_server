@@ -197,6 +197,19 @@ router.post("/", authenticateToken, paimentValidator, async (req, res) => {
   }
 })
 
+
+// historique
+router.get("/historique", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.user
+    const historique = await Paiment.find({ emeteur: id })
+    res.status(200).json({ historique, status: "success" })
+  } catch (error) {
+    console.error(error.message)
+    res.status(500).json({ message: error.message, status: "error" })
+  }
+})
+
 router.get("/historique/:etat", async (req, res) => {
   try {
     const { etat } = req.params
