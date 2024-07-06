@@ -33,8 +33,7 @@ router.post("/login", loginValidator, async (req, res) => {
       return res.status(400).send({ message: "User not found", status: "error" })
     }
     if (!bcrypt.compareSync(password, user.password)) {
-      res.status(400).send({ message: "password incorrect", status: "error" })
-      return
+      return res.status(400).send({ message: "password incorrect", status: "error" })
     }
 
     const token = generateAccessToken(user.id)
